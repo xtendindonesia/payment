@@ -1,0 +1,44 @@
+{
+    "name": "xtend/payment",
+    "description": "Payment Module for ZF3",
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "zf3",
+        "zf2",
+        "logger",
+        "psr3"
+    ],
+    "homepage": "http://xtendindonesia.co.id",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.1",
+        "guzzlehttp/guzzle": "^6.2",
+        "guzzlehttp/psr7": "~1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Xtend\\Payment\\": "src/Xtend/Payment"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Xtend\\PaymentTest\\": "test/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "0.0.1-dev"
+        }
+    },
+    "scripts": {
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^2.8",
+        "phpunit/phpunit": "^5.5"
+    }
+}
