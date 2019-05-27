@@ -28,6 +28,11 @@ class Bri implements AdapterInterface
      *       'cust_code' => '892837394083',    // from database
      *       'name' => 'Masuno',               // from database
      *    ],
+     *    'auth' => [
+     *       'client_id' => '<client id>',         // from config (dev/prod)
+     *       'client_secret' => '<client_secret>', // from config (dev/prod)
+     *       'code' => '<code>'                    // from config (dev/prod)
+     *    ],
      *];
      *
      */
@@ -90,7 +95,7 @@ class Bri implements AdapterInterface
         return $this->client;
     }
 
-    public function create(string $number, float $amount, string $desc, \DateTime $expired)
+    public function create(string $number, float $amount, string $desc, \DateTime $expired): ?array
     {
         $uri = '/v1/api/briva';
         $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
@@ -106,9 +111,10 @@ class Bri implements AdapterInterface
         $request  = new Request('POST', $url, $this->getHttpHeaders(), json_encode($bodyRequest));
         try {
             $response = $this->getClient()->send($request);
-            return $response->getBody()->getContents();
+            $jsonResponse = json_decode($response->getBody()->getContents(), true);
+            return $jsonResponse;
         } catch (\Exception $e) {
-            throw (new \RuntimeException($e->getMessage());
+            throw new \RuntimeException($e->getMessage());
         }
     }
 
@@ -124,7 +130,7 @@ class Bri implements AdapterInterface
     {
     }
 
-    public function authorize()
+    public function authorize(): ?array
     {
         $uri = '/v1/api/token';
         $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
@@ -138,9 +144,9 @@ class Bri implements AdapterInterface
         try {
             $response = $this->getClient()->send($request);
             $jsonResponse = json_decode($response->getBody()->getContents(), true);
-            return $response->getBody()->getContents();
+            return $jsonResponse;
         } catch (\Exception $e) {
-            throw (new \RuntimeException($e->getMessage());
+            throw new \RuntimeException($e->getMessage());
         }
     }
 }
