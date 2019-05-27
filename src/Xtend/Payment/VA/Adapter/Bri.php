@@ -106,11 +106,10 @@ class Bri implements AdapterInterface
         $request  = new Request('POST', $url, $this->getHttpHeaders(), json_encode($bodyRequest));
         try {
             $response = $this->getClient()->send($request);
-            echo 'Success: ' . $response->getStatusCode();
+            return $response->getBody()->getContents();
         } catch (\Exception $e) {
-            echo 'Error: ' . $e->getMessage();
+            throw (new \RuntimeException($e->getMessage());
         }
-
     }
 
     public function delete(string $number)
@@ -123,5 +122,25 @@ class Bri implements AdapterInterface
 
     public function getDetail(string $number)
     {
+    }
+
+    public function authorize()
+    {
+        $uri = '/v1/api/token';
+        $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
+        $bodyRequest = [
+            'grant_type' => 'authorization_code',
+            'client_id'  => $this->getConfigs()['auth']['client_id'],
+            'client_secret' => $this->getConfigs()['auth']['client_secret'],
+            'code' => $this->getConfigs()['auth']['code'],
+        ];
+        $request  = new Request('POST', $url, $this->getHttpHeaders(), json_encode($bodyRequest));
+        try {
+            $response = $this->getClient()->send($request);
+            $jsonResponse = json_decode($response->getBody()->getContents(), true);
+            return $response->getBody()->getContents();
+        } catch (\Exception $e) {
+            throw (new \RuntimeException($e->getMessage());
+        }
     }
 }

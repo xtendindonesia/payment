@@ -1,6 +1,6 @@
 <?php
 
-require '../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $configs = [
     'http_client' => [
@@ -9,7 +9,7 @@ $configs = [
     ],
     'http_headers' => [
         'Authorization' => 'Bearer <access_token>', // from database
-        'X-BRI-KEY' => '<bri_key>', // from config (dev/prod)
+        'X-BRI-KEY' => '<bri key>', // from config (dev/prod)
         'Content-Type' => 'application/json'
     ],
     'account' => [
@@ -18,7 +18,14 @@ $configs = [
         'cust_code' => '892837394083',    // from database
         'name' => 'Masuno',               // from database
     ],
+    'auth' => [
+        'client_id' => '<client id>',     // from config (dev/prod)
+        'client_secret' => '<client_secret>', // from config (dev/prod)
+        'code' => '<code>'                // from config (dev/prod)
+    ],
 ];
 
 $bri = new Xtend\Payment\VA\Adapter\Bri($configs);
-$bri->create('892837394083', 1000, 'Testing Pembayaran', new \DateTime('tomorrow'));
+// $bri->create('892837394083', 1000, 'Testing Pembayaran', new \DateTime('tomorrow'));
+// $authorization = $bri->authorize();
+// print_r($authorization);
