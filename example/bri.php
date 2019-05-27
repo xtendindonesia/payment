@@ -30,7 +30,7 @@ $bri = new Xtend\Payment\VA\Adapter\Bri($configs);
 // authorization
 try {
    $authorization = $bri->authorize();
-   var_dump($authorization);
+   print_r($authorization);
 } catch (\Exception $e) {
    echo 'Error: ';
    echo $e->getMessage();
@@ -38,7 +38,17 @@ try {
 
 // create va
 try {
-   $bri->create('892837394083', 1000, 'Testing Pembayaran', new \DateTime('tomorrow'));
+   $va = $bri->create('892837394083', 1000, 'Testing Pembayaran', new \DateTime('tomorrow'));
+   print_r($va);
+} catch (\Exception $e) {
+   echo 'Error: ';
+   echo $e->getMessage();
+}
+
+// get report
+try {
+    $report = $bri->getReport(new \DateTime('today'), new \DateTime('today'));
+    print_r($report);
 } catch (\Exception $e) {
    echo 'Error: ';
    echo $e->getMessage();

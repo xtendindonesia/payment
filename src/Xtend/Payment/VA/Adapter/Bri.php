@@ -111,8 +111,13 @@ class Bri implements AdapterInterface
         $request  = new Request('POST', $url, $this->getHttpHeaders(), json_encode($bodyRequest));
         try {
             $response = $this->getClient()->send($request);
-            $jsonResponse = json_decode($response->getBody()->getContents(), true);
-            return $jsonResponse;
+            if ($response->getStatusCode() == '200') {
+                $jsonResponse = json_decode($response->getBody()->getContents(), true);
+                return $jsonResponse;
+            }
+
+            $message = $response->getStatusCode() . ':' . $jsonResponse['responseCode'] . ':' . $jsonResponse['responseCode'];
+            throw new \RuntimeException($message);
         } catch (\Exception $e) {
             throw new \RuntimeException($e->getMessage());
         }
@@ -128,6 +133,32 @@ class Bri implements AdapterInterface
 
     public function getDetail(string $number)
     {
+    }
+
+    public function getReport(\DateTime $startDate, \DateTime $endDate): ?array
+    {
+        $urls = [
+            '/v1/api/briva/report',
+            $this->getConfigs()['account']['institution_code'],
+            $this->getConfigs()['account']['briva_no'],
+            $startDate->format('Ymd'),
+            $endDate->format('Ymd'),
+        ];
+        $url = $this->getConfigs()['http_client']['base_uri'] . implode('/', $urls);
+        echo $url, PHP_EOL;
+        $request  = new Request('GET', $url, $this->getHttpHeaders());
+        try {
+            $response = $this->getClient()->send($request);
+            if ($response->getStatusCode() == '200') {
+                $jsonResponse = json_decode($response->getBody()->getContents(), true);
+                return $jsonResponse;
+            }
+
+            $message = $response->getStatusCode() . ':' . $jsonResponse['responseCode'] . ':' . $jsonResponse['responseCode'];
+            throw new \RuntimeException($message);
+        } catch (\Exception $e) {
+            throw new \RuntimeException($e->getMessage());
+        }
     }
 
     public function authorize(): ?array
