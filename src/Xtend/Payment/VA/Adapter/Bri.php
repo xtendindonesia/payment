@@ -123,8 +123,40 @@ class Bri implements AdapterInterface
         }
     }
 
+    protected function encodeBody($institutionCode, $brivaNo, $custCode)
+    {
+        $params  = compact(['institutionCode', 'brivaNo', 'custCode']);
+        return http_build_query($params);
+    }
+
     public function delete(string $number)
     {
+        $institutionCode = $this->getConfigs()['account']['institution_code'];
+        $brivaNo = $this->getConfigs()['account']['briva_no'];
+
+        $uri = '/v1/api/briva';
+        $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
+        
+        // Set Header
+        $headers = 'application/x-www-form-urlencoded';
+        $currentHeaders  = $this->getHttpHeaders();
+        $currentHeaders['Content-Type'] = $headers;
+
+        // Set Body to URL Encoded
+        $data =  $this->encodeBody($institutionCode, $brivaNo, $number);
+        $request  = new Request('DELETE', $url, $currentHeaders,$data);
+        try {
+            $response = $this->getClient()->send($request);
+            if ($response->getStatusCode() == '200') {
+                $jsonResponse = json_decode($response->getBody()->getContents(), true);
+                return $jsonResponse;
+            }
+
+            $message = $response->getStatusCode() . ':' . $jsonResponse['responseCode'] . ':' . $jsonResponse['responseCode'];
+            throw new \RuntimeException($message);
+        } catch (\Exception $e) {
+            throw new \RuntimeException($e->getMessage());
+        }
     }
 
     public function update(string $number, array $data)
