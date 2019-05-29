@@ -28,27 +28,36 @@ $configs = [
 $bri = new Xtend\Payment\VA\Adapter\Bri($configs);
 
 // authorization
-try {
-   $authorization = $bri->authorize();
-   print_r($authorization);
-} catch (\Exception $e) {
-   echo 'Error: ';
-   echo $e->getMessage();
-}
+// try {
+//    $authorization = $bri->authorize();
+//    print_r($authorization);
+// } catch (\Exception $e) {
+//    echo 'Error: ';
+//    echo $e->getMessage();
+// }
 
 // create va
-try {
-   $va = $bri->create('892837394083', 1000, 'Testing Pembayaran', new \DateTime('tomorrow'));
-   print_r($va);
-} catch (\Exception $e) {
-   echo 'Error: ';
-   echo $e->getMessage();
-}
+// try {
+//    $va = $bri->create('892837394083', 1000, 'Testing Pembayaran', new \DateTime('tomorrow'));
+//    print_r($va);
+// } catch (\Exception $e) {
+//    echo 'Error: ';
+//    echo $e->getMessage();
+// }
 
 // get report
+// try {
+//     $report = $bri->getReport(new \DateTime('today'), new \DateTime('today'));
+//     print_r($report);
+// } catch (\Exception $e) {
+//    echo 'Error: ';
+//    echo $e->getMessage();
+// }
+
+//delete va
 try {
-    $report = $bri->getReport(new \DateTime('today'), new \DateTime('today'));
-    print_r($report);
+    $data = $bri->delete("0190001");
+    print_r($data);
 } catch (\Exception $e) {
    echo 'Error: ';
    echo $e->getMessage();
