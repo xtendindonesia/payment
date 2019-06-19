@@ -6,15 +6,17 @@ namespace Xtend\Payment\VA\Adapter;
 
 interface AdapterInterface
 {
+    public function setSandbox(bool $sandbox); 
+
+    public function getSandbox(): bool;
+
+    public function getEndpoint(): string;
+
     public function setConfigs(array $confings);
 
-    public function getConfigs();
+    public function getConfigs(): ?array;
 
-    public function setClient($client);
-
-    public function getClient();
-
-    public function create(string $number, float $amount, string $desc, \DateTime $expired);
+    public function create(string $number, float $amount, string $desc, \DateTime $expired): ?array;
 
     public function delete(string $number);
 

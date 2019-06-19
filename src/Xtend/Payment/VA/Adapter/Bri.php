@@ -39,6 +39,16 @@ class Bri implements AdapterInterface
     protected $configs;
 
     /**
+     * @var string
+     */
+    protected $endpoint;
+
+    /**
+     * @var bool
+     */
+    protected $sandbox;
+
+    /**
      *
      */
     protected $client;
@@ -48,10 +58,19 @@ class Bri implements AdapterInterface
      */
     protected $httpHeaders;
 
-    public function __construct($configs)
+    public function __construct(array $configs, bool $sandbox = false)
     {
         $this->setConfigs($configs);
         $this->setHttpHeaders($configs['http_headers']);
+        // setup endpoint
+        if ($sandbox === true || (isset($configs['sandbox']) ? $configs['sandbox'] : false)) {
+            $this->endpoint = 'https://partner.api.bri.co.id';
+        } else {
+            $this->endpoint = 'https://sandbox.partner.api.bri.co.id';
+        }
+
+        // set http_client
+	$this->configs['http_client']['base_uri'] = $this->getEndpoint();
     }
 
     public function setConfigs(array $configs)
@@ -59,9 +78,24 @@ class Bri implements AdapterInterface
         $this->configs = $configs;
     }
 
-    public function getConfigs()
+    public function getConfigs(): array
     {
         return $this->configs;
+    }
+
+    public function setSandbox(bool $sandbox)
+    {
+        $this->sandbox = $sandbox;
+    }
+
+    public function getSandbox(): bool
+    {
+        return $this->sandbox;
+    }
+
+    public function getEndpoint(): string
+    {
+        return $this->endpoint;
     }
 
     public function setHttpHeaders(array $httpHeaders)
@@ -89,6 +123,7 @@ class Bri implements AdapterInterface
     public function getClient()
     {
         if ($this->client !== null || $this->getConfigs()['http_client'] !== null) {
+            //print_r($this->getConfigs()['http_client']);
             $this->client = new HttpClient($this->getConfigs()['http_client']);
         } 
 
@@ -195,15 +230,14 @@ class Bri implements AdapterInterface
 
     public function authorize(): ?array
     {
-        $uri = '/v1/api/token';
+        $uri = '/oauth/client_credential/accesstoken?grant_type=client_credentials';
         $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
+        $headers = ['Content-Type' => 'application/x-www-form-urlencoded'];
         $bodyRequest = [
-            'grant_type' => 'authorization_code',
             'client_id'  => $this->getConfigs()['auth']['client_id'],
             'client_secret' => $this->getConfigs()['auth']['client_secret'],
-            'code' => $this->getConfigs()['auth']['code'],
         ];
-        $request  = new Request('POST', $url, $this->getHttpHeaders(), json_encode($bodyRequest));
+        $request  = new Request('POST', $url, $headers, http_build_query($bodyRequest));
         try {
             $response = $this->getClient()->send($request);
             $jsonResponse = json_decode($response->getBody()->getContents(), true);
