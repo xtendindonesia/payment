@@ -16,7 +16,7 @@ interface AdapterInterface
 
     public function getConfigs(): ?array;
 
-    public function create(string $number, float $amount, string $desc, \DateTime $expired): ?array;
+    public function create(string $number, float $amount, string $name, string $desc, \DateTime $expired): ?array;
 
     public function delete(string $number);
 

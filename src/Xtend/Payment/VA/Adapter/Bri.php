@@ -19,7 +19,6 @@ class Bri implements AdapterInterface
      *    ],
      *    'http_headers' => [
      *       'Authorization' => 'Bearer <access_token>', // from database
-     *       'X-BRI-KEY' => '<bri_key>', // from config (dev/prod)
      *       'Content-Type' => 'application/json'
      *    ],
      *    'account' => [
@@ -54,9 +53,14 @@ class Bri implements AdapterInterface
     protected $client;
 
     /**
+     * @var string
+     */
+    protected $timestamp;
+
+    /**
      * @var array
      */
-    protected $httpHeaders;
+    protected $httpHeaders = [];
 
     public function __construct(array $configs, bool $sandbox = false)
     {
@@ -70,7 +74,7 @@ class Bri implements AdapterInterface
         }
 
         // set http_client
-	$this->configs['http_client']['base_uri'] = $this->getEndpoint();
+	    $this->configs['http_client']['base_uri'] = $this->getEndpoint();
     }
 
     public function setConfigs(array $configs)
@@ -96,6 +100,28 @@ class Bri implements AdapterInterface
     public function getEndpoint(): string
     {
         return $this->endpoint;
+    }
+
+    /**
+     * Set Timestamp
+     *
+     * @param string timestamp
+     */
+    public function setTimestamp(string $timestamp)
+    {
+        $this->timestamp = $timestamp;
+    }
+
+    /**
+     * Get Timestamp
+     */
+    public function getTimestamp(): string
+    {
+        if ($this->timestamp === null) {
+            $this->setTimestamp($this->generateTimestamp());
+        }
+
+        return $this->timestamp;
     }
 
     public function setHttpHeaders(array $httpHeaders)
@@ -130,20 +156,39 @@ class Bri implements AdapterInterface
         return $this->client;
     }
 
-    public function create(string $number, float $amount, string $desc, \DateTime $expired): ?array
+    /**
+     * Create Virtual Account
+     *
+     * @param  string   $number
+     * @param  float    $amount
+     * @param  string   $name
+     * @param  string   $desc
+     * @param  DateTime $expired
+     * @return array|null
+     *
+     */
+    public function create(string $number, float $amount, string $name, string $desc, \DateTime $expired): ?array
     {
-        $uri = '/v1/api/briva';
+        $uri = '/v1/briva';
         $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
+        // compose body request
         $bodyRequest = [
             'institutionCode' => $this->getConfigs()['account']['institution_code'],
             'brivaNo'  => $this->getConfigs()['account']['briva_no'],
-            'custCode' => $this->getConfigs()['account']['cust_code'],
-            'nama' => $this->getConfigs()['account']['name'],
-            'amount' => $amount,
-            'keterangan' => $desc,
+            'custCode' => $number,
+            'nama'     => $name,
+            'amount'   => $amount,
+            'keterangan'  => $desc,
             'expiredDate' => $expired->format('Y-m-d H:i:s')
         ];
-        $request  = new Request('POST', $url, $this->getHttpHeaders(), json_encode($bodyRequest));
+        $jsonBodyRequest = json_encode($bodyRequest);
+
+        // generate signature & timestamp
+        $signature = $this->generateSignature('POST', $uri, $this->getTimestamp(), $jsonBodyRequest);
+        $this->httpHeaders['BRI-Signature'] = $signature;
+        $this->httpHeaders['BRI-Timestamp'] = $this->getTimestamp();
+        $request   = new Request('POST', $url, $this->getHttpHeaders(), $jsonBodyRequest);
+
         try {
             $response = $this->getClient()->send($request);
             if ($response->getStatusCode() == '200') {
@@ -228,6 +273,11 @@ class Bri implements AdapterInterface
         }
     }
 
+    /**
+     * Get Access Token
+     *
+     * @return array|null
+     */
     public function authorize(): ?array
     {
         $uri = '/oauth/client_credential/accesstoken?grant_type=client_credentials';
@@ -245,5 +295,30 @@ class Bri implements AdapterInterface
         } catch (\Exception $e) {
             throw new \RuntimeException($e->getMessage());
         }
+    }
+
+    /**
+     * Generate Timestamp in ISO8601
+     *
+     * @return string
+     */
+    public function generateTimestamp(): string
+    {
+        return gmdate("Y-m-d\TH:i:s.000\Z");
+    }
+
+    /**
+     * Generate Signature
+     *
+     * @return string
+     */
+    public function generateSignature(string $verb, string $uri, string $timestamp, string $body = ''): string
+    {
+        $secret = $this->getConfigs()['auth']['client_secret'];
+        $token  = $this->getHttpHeaders()['Authorization'];
+        $payload = "path=$uri&verb=$verb&token=$token&timestamp=$timestamp&body=$body";
+        $signPayload = hash_hmac('sha256', $payload, $secret, true);
+        $base64  = base64_encode($signPayload);
+        return $base64;
     }
 }

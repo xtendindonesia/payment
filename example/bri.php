@@ -7,40 +7,40 @@ $configs = [
         'ssl_verify' => false
     ],
     'http_headers' => [
-        'Authorization' => 'Bearer <access_token>', // from database
+        'Authorization' => 'Bearer tKE6LMgarr6dEaFpgyG2HNXePgPq', // from database
         'Content-Type' => 'application/json'
     ],
     'account' => [
-        'institution_code' => '<institution_code>',  // from config (dev/prod)
-        'briva_no' => '<briva_no>',            // from config (dev/prod)
-        'cust_code' => '892837394083',    // from database
-        'name' => 'Masuno',               // from database
+        'institution_code' => 'J104408',  // from config (dev/prod)
+        'briva_no' => '77777',            // from config (dev/prod)
     ],
     'auth' => [
         'client_id' => 'AkxlveHMTinjkdp2y6R3ecNIhAKlS2R0',     // from config (dev/prod)
-        'client_secret' => 'MeEQypXfHKSjXeL8', // from config (dev/prod)
+        'client_secret' => '', // from config (dev/prod)
     ],
 ];
 
 $bri = new Xtend\Payment\VA\Adapter\Bri($configs);
 
 // authorization
+//try {
+//   $authorization = $bri->authorize();
+//   print_r($authorization);
+//} catch (\Exception $e) {
+//   echo 'Error: ';
+//   echo $e->getMessage();
+//}
+
+// create va
 try {
-   $authorization = $bri->authorize();
-   print_r($authorization);
+   $va = $bri->create('9990004', 1000000, 'Arief Abdillah', 'DP Paket C', new \DateTime('tomorrow'));
+   print_r($va);
 } catch (\Exception $e) {
+   echo 'HTPP Headers: ';
+   print_r($bri->getHttpHeaders());
    echo 'Error: ';
    echo $e->getMessage();
 }
-
-// create va
-// try {
-//    $va = $bri->create('892837394083', 1000, 'Testing Pembayaran', new \DateTime('tomorrow'));
-//    print_r($va);
-// } catch (\Exception $e) {
-//    echo 'Error: ';
-//    echo $e->getMessage();
-// }
 
 // get report
 // try {
