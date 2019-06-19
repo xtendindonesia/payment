@@ -7,7 +7,7 @@ $configs = [
         'ssl_verify' => false
     ],
     'http_headers' => [
-        'Authorization' => 'Bearer tKE6LMgarr6dEaFpgyG2HNXePgPq', // from database
+        'Authorization' => 'Bearer mk92wbpMq6RlSoyR0nqAjiR9C1AC', // from database
         'Content-Type' => 'application/json'
     ],
     'account' => [
@@ -23,33 +23,35 @@ $configs = [
 $bri = new Xtend\Payment\VA\Adapter\Bri($configs);
 
 // authorization
-//try {
-//   $authorization = $bri->authorize();
-//   print_r($authorization);
-//} catch (\Exception $e) {
-//   echo 'Error: ';
-//   echo $e->getMessage();
-//}
+// try {
+//    $authorization = $bri->authorize();
+//    print_r($authorization);
+// } catch (\Exception $e) {
+//    echo 'Error: ';
+//    echo $e->getMessage();
+// }
 
 // create va
-try {
-   $va = $bri->create('9990004', 1000000, 'Arief Abdillah', 'DP Paket C', new \DateTime('tomorrow'));
-   print_r($va);
-} catch (\Exception $e) {
-   echo 'HTPP Headers: ';
-   print_r($bri->getHttpHeaders());
-   echo 'Error: ';
-   echo $e->getMessage();
-}
+// try {
+//    $va = $bri->create('9990004', 1000000, 'Arief Abdillah', 'DP Paket C', new \DateTime('tomorrow'));
+//    print_r($va);
+// } catch (\Exception $e) {
+//    echo 'HTPP Headers: ';
+//    print_r($bri->getHttpHeaders());
+//    echo 'Error: ';
+//    echo $e->getMessage();
+// }
 
 // get report
-// try {
-//     $report = $bri->getReport(new \DateTime('today'), new \DateTime('today'));
-//     print_r($report);
-// } catch (\Exception $e) {
-//     echo 'Error: ';
-//     echo $e->getMessage();
-// }
+try {
+    $report = $bri->getReport(new \DateTime('today'), new \DateTime('today'));
+    print_r($report);
+} catch (\Exception $e) {
+    echo 'HTPP Headers: ';
+    print_r($bri->getHttpHeaders());
+    echo 'Error: ';
+    echo $e->getMessage();
+}
 
 // delete va
 // try {

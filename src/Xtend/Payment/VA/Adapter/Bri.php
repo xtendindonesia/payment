@@ -24,13 +24,10 @@ class Bri implements AdapterInterface
      *    'account' => [
      *       'institution_code' => '<institution_code>',  // from config (dev/prod)
      *       'briva_no' => '<briva_no>',            // from config (dev/prod)
-     *       'cust_code' => '892837394083',    // from database
-     *       'name' => 'Masuno',               // from database
      *    ],
      *    'auth' => [
      *       'client_id' => '<client id>',         // from config (dev/prod)
      *       'client_secret' => '<client_secret>', // from config (dev/prod)
-     *       'code' => '<code>'                    // from config (dev/prod)
      *    ],
      *];
      *
@@ -247,18 +244,33 @@ class Bri implements AdapterInterface
     {
     }
 
+    /**
+     * Get Report
+     *
+     * @param  \DateTime $startDate
+     * @param  \DateTime $endDate
+     *
+     * @return array|null
+     */
     public function getReport(\DateTime $startDate, \DateTime $endDate): ?array
     {
         $urls = [
-            '/v1/api/briva/report',
+            '/v1/briva/report',
             $this->getConfigs()['account']['institution_code'],
             $this->getConfigs()['account']['briva_no'],
             $startDate->format('Ymd'),
             $endDate->format('Ymd'),
         ];
-        $url = $this->getConfigs()['http_client']['base_uri'] . implode('/', $urls);
-        echo $url, PHP_EOL;
-        $request  = new Request('GET', $url, $this->getHttpHeaders());
+        $uri = implode('/', $urls);
+        $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
+
+        // set signature
+        $signature = $this->generateSignature('GET', $uri, $this->getTimestamp());
+        $this->httpHeaders['BRI-Signature'] = $signature;
+        $this->httpHeaders['BRI-Timestamp'] = $this->getTimestamp();
+        // remove content-type
+        unset($this->httpHeaders['Content-Type']);
+        $request = new Request('GET', $url, $this->getHttpHeaders());
         try {
             $response = $this->getClient()->send($request);
             if ($response->getStatusCode() == '200') {
