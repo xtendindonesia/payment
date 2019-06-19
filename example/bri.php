@@ -50,15 +50,15 @@ $bri = new Xtend\Payment\VA\Adapter\Bri($configs);
 //     $report = $bri->getReport(new \DateTime('today'), new \DateTime('today'));
 //     print_r($report);
 // } catch (\Exception $e) {
+//     echo 'Error: ';
+//     echo $e->getMessage();
+// }
+
+// delete va
+// try {
+//     $data = $bri->delete("0190001");
+//     print_r($data);
+// } catch (\Exception $e) {
 //    echo 'Error: ';
 //    echo $e->getMessage();
 // }
-
-//delete va
-try {
-    $data = $bri->delete("0190001");
-    print_r($data);
-} catch (\Exception $e) {
-   echo 'Error: ';
-   echo $e->getMessage();
-}
