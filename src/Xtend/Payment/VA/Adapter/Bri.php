@@ -200,28 +200,30 @@ class Bri implements AdapterInterface
         }
     }
 
-    protected function encodeBody($institutionCode, $brivaNo, $custCode)
-    {
-        $params  = compact(['institutionCode', 'brivaNo', 'custCode']);
-        return http_build_query($params);
-    }
-
+    /**
+     * Delete Virtual Account
+     *
+     * @param  string $number
+     * @return array
+     */
     public function delete(string $number)
     {
         $institutionCode = $this->getConfigs()['account']['institution_code'];
         $brivaNo = $this->getConfigs()['account']['briva_no'];
 
-        $uri = '/v1/api/briva';
+        $uri = '/v1/briva';
         $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
         
-        // Set Header
-        $headers = 'application/x-www-form-urlencoded';
-        $currentHeaders  = $this->getHttpHeaders();
-        $currentHeaders['Content-Type'] = $headers;
-
         // Set Body to URL Encoded
-        $data =  $this->encodeBody($institutionCode, $brivaNo, $number);
-        $request  = new Request('DELETE', $url, $currentHeaders,$data);
+        $params = ['institutionCode' => $institutionCode, 'brivaNo' => $brivaNo, 'custCode' => $number];
+        $body   = http_build_query($params);
+
+        // generate signature & timestamp
+        $signature = $this->generateSignature('DELETE', $uri, $this->getTimestamp(), $body);
+        unset($this->httpHeaders['Content-Type']);
+        $this->httpHeaders['BRI-Signature'] = $signature;
+        $this->httpHeaders['BRI-Timestamp'] = $this->getTimestamp();
+        $request  = new Request('DELETE', $url, $this->getHttpHeaders(), $body);
         try {
             $response = $this->getClient()->send($request);
             if ($response->getStatusCode() == '200') {
@@ -326,8 +328,8 @@ class Bri implements AdapterInterface
      */
     public function generateSignature(string $verb, string $uri, string $timestamp, string $body = ''): string
     {
-        $secret = $this->getConfigs()['auth']['client_secret'];
-        $token  = $this->getHttpHeaders()['Authorization'];
+        $secret  = $this->getConfigs()['auth']['client_secret'];
+        $token   = $this->getHttpHeaders()['Authorization'];
         $payload = "path=$uri&verb=$verb&token=$token&timestamp=$timestamp&body=$body";
         $signPayload = hash_hmac('sha256', $payload, $secret, true);
         $base64  = base64_encode($signPayload);

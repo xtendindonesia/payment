@@ -7,7 +7,7 @@ $configs = [
         'ssl_verify' => false
     ],
     'http_headers' => [
-        'Authorization' => 'Bearer mk92wbpMq6RlSoyR0nqAjiR9C1AC', // from database
+        'Authorization' => 'Bearer lpdL4EmmGFbxUvbbrQZa5q9v0FHQ', // from database
         'Content-Type' => 'application/json'
     ],
     'account' => [
@@ -43,21 +43,23 @@ $bri = new Xtend\Payment\VA\Adapter\Bri($configs);
 // }
 
 // get report
+// try {
+//     $report = $bri->getReport(new \DateTime('today'), new \DateTime('today'));
+//     print_r($report);
+// } catch (\Exception $e) {
+//     echo 'HTPP Headers: ';
+//     print_r($bri->getHttpHeaders());
+//     echo 'Error: ';
+//     echo $e->getMessage();
+// }
+
+// delete va
 try {
-    $report = $bri->getReport(new \DateTime('today'), new \DateTime('today'));
-    print_r($report);
+    $data = $bri->delete("9990004");
+    print_r($data);
 } catch (\Exception $e) {
     echo 'HTPP Headers: ';
     print_r($bri->getHttpHeaders());
     echo 'Error: ';
     echo $e->getMessage();
 }
-
-// delete va
-// try {
-//     $data = $bri->delete("0190001");
-//     print_r($data);
-// } catch (\Exception $e) {
-//    echo 'Error: ';
-//    echo $e->getMessage();
-// }
