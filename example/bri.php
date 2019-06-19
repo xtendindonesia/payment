@@ -3,11 +3,12 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 $configs = [
+    'sandbox' => true,
     'http_client' => [
         'ssl_verify' => false
     ],
     'http_headers' => [
-        'Authorization' => 'Bearer lpdL4EmmGFbxUvbbrQZa5q9v0FHQ', // from database
+        'Authorization' => 'Bearer kTAq6F2jSBxUiGXAmlYdDUl7aPV4', // from database
         'Content-Type' => 'application/json'
     ],
     'account' => [
@@ -23,17 +24,18 @@ $configs = [
 $bri = new Xtend\Payment\VA\Adapter\Bri($configs);
 
 // authorization
-// try {
-//    $authorization = $bri->authorize();
-//    print_r($authorization);
-// } catch (\Exception $e) {
-//    echo 'Error: ';
-//    echo $e->getMessage();
-// }
+try {
+   echo $bri->getEndpoint(), PHP_EOL;
+   $authorization = $bri->authorize();
+   print_r($authorization);
+} catch (\Exception $e) {
+   echo 'Error: ';
+   echo $e->getMessage();
+}
 
 // create va
 // try {
-//    $va = $bri->create('9990004', 1000000, 'Arief Abdillah', 'DP Paket C', new \DateTime('tomorrow'));
+//    $va = $bri->create('9990007', 1000000, 'Ram Lee', 'DP Paket A', new \DateTime('tomorrow'));
 //    print_r($va);
 // } catch (\Exception $e) {
 //    echo 'HTPP Headers: ';
@@ -54,12 +56,12 @@ $bri = new Xtend\Payment\VA\Adapter\Bri($configs);
 // }
 
 // delete va
-try {
-    $data = $bri->delete("9990004");
-    print_r($data);
-} catch (\Exception $e) {
-    echo 'HTPP Headers: ';
-    print_r($bri->getHttpHeaders());
-    echo 'Error: ';
-    echo $e->getMessage();
-}
+// try {
+//     $data = $bri->delete("9990004");
+//     print_r($data);
+// } catch (\Exception $e) {
+//     echo 'HTPP Headers: ';
+//     print_r($bri->getHttpHeaders());
+//     echo 'Error: ';
+//     echo $e->getMessage();
+// }

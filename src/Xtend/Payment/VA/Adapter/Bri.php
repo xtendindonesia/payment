@@ -65,9 +65,9 @@ class Bri implements AdapterInterface
         $this->setHttpHeaders($configs['http_headers']);
         // setup endpoint
         if ($sandbox === true || (isset($configs['sandbox']) ? $configs['sandbox'] : false)) {
-            $this->endpoint = 'https://partner.api.bri.co.id';
-        } else {
             $this->endpoint = 'https://sandbox.partner.api.bri.co.id';
+        } else {
+            $this->endpoint = 'https://partner.api.bri.co.id';
         }
 
         // set http_client
