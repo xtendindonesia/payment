@@ -154,6 +154,45 @@ class Bri implements AdapterInterface
     }
 
     /**
+     * Get Virtual Account
+     *
+     * @param  string $number
+     * @return array
+     */
+    public function get(string $number)
+    {
+        $institutionCode = $this->getConfigs()['account']['institution_code'];
+        $brivaNo = $this->getConfigs()['account']['briva_no'];
+
+        $uri = '/v1/briva/' . implode('/', [$institutionCode, $brivaNo]) . '/' . $number;
+        $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
+        
+        // Set Body to URL Encoded
+        // $params = ['institutionCode' => $institutionCode, 'brivaNo' => $brivaNo, 'custCode' => $number];
+        // $body   = http_build_query($params);
+        $body = '';
+
+        // generate signature & timestamp
+        $signature = $this->generateSignature('GET', $uri, $this->getTimestamp());
+        unset($this->httpHeaders['Content-Type']);
+        $this->httpHeaders['BRI-Signature'] = $signature;
+        $this->httpHeaders['BRI-Timestamp'] = $this->getTimestamp();
+        $request  = new Request('GET', $url, $this->getHttpHeaders(), $body);
+        try {
+            $response = $this->getClient()->send($request);
+            if ($response->getStatusCode() == '200') {
+                $jsonResponse = json_decode($response->getBody()->getContents(), true);
+                return $jsonResponse;
+            }
+
+            $message = $response->getStatusCode() . ':' . $jsonResponse['responseCode'] . ':' . $jsonResponse['responseCode'];
+            throw new \RuntimeException($message);
+        } catch (\Exception $e) {
+            throw new \RuntimeException($e->getMessage());
+        }
+    }
+
+    /**
      * Create Virtual Account
      *
      * @param  string   $number
