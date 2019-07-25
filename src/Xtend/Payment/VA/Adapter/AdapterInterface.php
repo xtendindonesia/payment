@@ -6,7 +6,7 @@ namespace Xtend\Payment\VA\Adapter;
 
 interface AdapterInterface
 {
-    public function setSandbox(bool $sandbox); 
+    public function setSandbox(bool $sandbox);
 
     public function getSandbox(): bool;
 
