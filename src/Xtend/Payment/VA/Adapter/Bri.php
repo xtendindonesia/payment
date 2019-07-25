@@ -15,7 +15,6 @@ class Bri implements AdapterInterface
      * [
      *    'http_client' => [
      *       'base_uri' => 'https://developer.bri.co.id',  // from config (dev/prod)
-     *       'ssl_verify' => false
      *    ],
      *    'http_headers' => [
      *       'Authorization' => 'Bearer <access_token>', // from database
@@ -71,7 +70,8 @@ class Bri implements AdapterInterface
         }
 
         // set http_client
-	    $this->configs['http_client']['base_uri'] = $this->getEndpoint();
+	$this->configs['http_client']['base_uri']   = $this->getEndpoint();
+	$this->configs['http_client']['ssl_verify'] = false;
     }
 
     public function setConfigs(array $configs)
