@@ -70,8 +70,8 @@ class Bri implements AdapterInterface
         }
 
         // set http_client
-	$this->configs['http_client']['base_uri']   = $this->getEndpoint();
-	$this->configs['http_client']['ssl_verify'] = false;
+        $this->configs['http_client']['base_uri']   = $this->getEndpoint();
+        $this->configs['http_client']['ssl_verify'] = false;
     }
 
     public function setConfigs(array $configs)
@@ -140,7 +140,6 @@ class Bri implements AdapterInterface
 
     public function setClient($client)
     {
-    
     }
 
     public function getClient()
@@ -148,25 +147,25 @@ class Bri implements AdapterInterface
         if ($this->client !== null || $this->getConfigs()['http_client'] !== null) {
             //print_r($this->getConfigs()['http_client']);
             $this->client = new HttpClient($this->getConfigs()['http_client']);
-        } 
+        }
 
         return $this->client;
     }
 
     /**
-     * Get Virtual Account
+     * Get Detail Virtual Account
      *
      * @param  string $number
      * @return array
      */
-    public function get(string $number)
+    public function getDetail(string $number)
     {
         $institutionCode = $this->getConfigs()['account']['institution_code'];
         $brivaNo = $this->getConfigs()['account']['briva_no'];
 
         $uri = '/v1/briva/' . implode('/', [$institutionCode, $brivaNo]) . '/' . $number;
         $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
-        
+
         // Set Body to URL Encoded
         // $params = ['institutionCode' => $institutionCode, 'brivaNo' => $brivaNo, 'custCode' => $number];
         // $body   = http_build_query($params);
@@ -252,7 +251,7 @@ class Bri implements AdapterInterface
 
         $uri = '/v1/briva';
         $url = $this->getConfigs()['http_client']['base_uri'] . $uri;
-        
+
         // Set Body to URL Encoded
         $params = ['institutionCode' => $institutionCode, 'brivaNo' => $brivaNo, 'custCode' => $number];
         $body   = http_build_query($params);
@@ -278,10 +277,6 @@ class Bri implements AdapterInterface
     }
 
     public function update(string $number, array $data)
-    {
-    }
-
-    public function getDetail(string $number)
     {
     }
 
