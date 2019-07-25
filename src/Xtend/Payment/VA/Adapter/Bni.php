@@ -169,7 +169,8 @@ class Bni implements AdapterInterface
                     throw new \RuntimeException($message);
                 }
 
-                return $jsonResponse;
+                $decryptResponse = BniEnc::decrypt($jsonResponse['data'], $clientId, $clientSecret);
+                return $decryptResponse;
             }
         } catch (\Exception $e) {
             throw new \RuntimeException($e->getMessage());
