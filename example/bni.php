@@ -9,7 +9,7 @@ $configs = [
     ],
     'auth' => [
         'client_id' => '10081',     // from config (dev/prod)
-        'client_secret' => '', // from config (dev/prod)
+        'client_secret' => '36fa9b7c1cad0a72dce96cdd43b72bca', // from config (dev/prod)
     ],
 ];
 
