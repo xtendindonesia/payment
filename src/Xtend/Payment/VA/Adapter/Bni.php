@@ -161,7 +161,7 @@ class Bni implements AdapterInterface
         $request   = new Request('POST', $url, $this->getHttpHeaders(), $jsonBodyRequest);
         try {
             $response = $this->getClient()->send($request);
-            print_r($data);
+            // print_r($data);
             if ($response->getStatusCode() == '200') {
                 $jsonResponse = json_decode($response->getBody()->getContents(), true);
                 if ($jsonResponse['status'] !== '000') {
