@@ -140,10 +140,8 @@ class Bni implements AdapterInterface
      */
     public function create(string $number, float $amount, string $name, string $desc, \DateTime $expired): ?array
     {
-        $url = $this->getConfigs()['http_client']['base_uri'];
-        $vaPrefix  = $this->getConfigs()['account']['va_prefix'];
-        $clientId  = $this->getConfigs()['auth']['client_id'];
-        $secretKey = $this->getConfigs()['auth']['client_secret'];
+        $clientId = $this->getConfigs()['auth']['client_id'];
+        $vaPrefix = $this->getConfigs()['account']['va_prefix'];
         $data = [
             'client_id' => $clientId,
             'type' => 'createBilling',
@@ -156,9 +154,55 @@ class Bni implements AdapterInterface
             'customer_email' => '',
             'customer_phone' => '',
         ];
-        $hashData = BniEnc::encrypt($data, $clientId, $secretKey);
+        try {
+            $response = $this->sendRequest($data);
+            return $response;
+        } catch (\Exception $e) {
+            throw new \RuntimeException($e->getMessage());
+        }
+    }
+
+    public function update(string $number, array $data)
+    {
+    }
+
+    /**
+     * Get Detail VA
+     *
+     * @param  string trxId
+     * @return null|array
+     */
+    public function getDetail(string $trxId)
+    {
+        $clientId  = $this->getConfigs()['auth']['client_id'];
+        $data = ['client_id' => $clientId, 'type'   => 'inquiryBilling', 'trx_id' => $trxId];
+        try {
+            $response = $this->sendRequest($data);
+            return $response;
+        } catch (\Exception $e) {
+            throw new \RuntimeException($e->getMessage());
+        }
+    }
+
+    public function delete(string $number)
+    {
+    }
+
+    /**
+     * Send HTTP Request to BNI Ecollection Server
+     *
+     * @param  array $data
+     * @return @array
+     * @throw  \RuntimeException
+     */
+    private function sendRequest($data)
+    {
+        $url = $this->getConfigs()['http_client']['base_uri'];
+        $clientId  = $this->getConfigs()['auth']['client_id'];
+        $secretKey = $this->getConfigs()['auth']['client_secret'];
+        $hashData  = BniEnc::encrypt($data, $clientId, $secretKey);
         $jsonBodyRequest = json_encode(['client_id' => $clientId, 'data' => $hashData]);
-        $request   = new Request('POST', $url, $this->getHttpHeaders(), $jsonBodyRequest);
+        $request  = new Request('POST', $url, $this->getHttpHeaders(), $jsonBodyRequest);
         try {
             $response = $this->getClient()->send($request);
             // print_r($data);
@@ -175,17 +219,5 @@ class Bni implements AdapterInterface
         } catch (\Exception $e) {
             throw new \RuntimeException($e->getMessage());
         }
-    }
-
-    public function update(string $number, array $data)
-    {
-    }
-
-    public function getDetail(string $number)
-    {
-    }
-
-    public function delete(string $number)
-    {
     }
 }

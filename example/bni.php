@@ -8,17 +8,31 @@ $configs = [
         'va_prefix' => '988'
     ],
     'auth' => [
-        'client_id' => '10081',     // from config (dev/prod)
-        'client_secret' => '36fa9b7c1cad0a72dce96cdd43b72bca', // from config (dev/prod)
+        'client_id' => '',     // from config (dev/prod)
+        'client_secret' => '', // from config (dev/prod)
     ],
 ];
 
 $bni = new Xtend\Payment\VA\Adapter\Bni($configs);
 
 // create va
+$trxId = null;
 try {
-   $va = $bni->create('01999999', 10000, 'Testing VA Production', 'Testing VA Production', new \DateTime('tomorrow'));
+   $va = $bni->create('01999989', 10000, 'Mr. Hello', 'Testing VA', new \DateTime('tomorrow'));
    print_r($va);
+   if (is_array($va)) {
+      $trxId = $va['trx_id'];
+   }
 } catch (\Exception $e) {
    echo 'Error: ', $e->getMessage(), PHP_EOL;
+}
+
+// get va
+if ($trxId !== null) {
+    try {
+       $va = $bni->getDetail($trxId);
+       print_r($va);
+    } catch (\Exception $e) {
+       echo 'Error: ', $e->getMessage(), PHP_EOL;
+    }
 }
