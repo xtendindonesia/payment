@@ -51,6 +51,13 @@ class Bni implements AdapterInterface
      */
     protected $httpHeaders = [];
 
+    /**
+     * Constructor
+     *
+     * @param array $configs
+     * @param bool  $sandbox
+     * @void
+     */
     public function __construct(array $configs, bool $sandbox = false)
     {
         $this->setConfigs($configs);
@@ -144,13 +151,14 @@ class Bni implements AdapterInterface
         $vaPrefix = $this->getConfigs()['account']['va_prefix'];
         $data = [
             'client_id' => $clientId,
-            'type' => 'createBilling',
+            'type'   => 'createBilling',
             'trx_id' => mt_rand(), // fill with Billing ID
-            'trx_amount' => $amount,
+            'trx_amount'   => $amount,
             'billing_type' => 'c',
             'datetime_expired' => $expired->format('c'),
-            'virtual_account' => $vaPrefix . $clientId . $number,
-            'customer_name' => $name,
+            'virtual_account'  => $vaPrefix . $clientId . $number,
+            'customer_name'  => $name,
+            'description'    => $desc,
             'customer_email' => '',
             'customer_phone' => '',
         ];
@@ -162,8 +170,44 @@ class Bni implements AdapterInterface
         }
     }
 
-    public function update(string $number, array $data)
+    /**
+     * Update VA
+     *
+     * @param  string trxId
+     * @param  array  data
+     * @return null|array
+     * @throw  \RuntimeException
+     */
+    public function update(string $trxId, array $data)
     {
+        $clientId = $this->getConfigs()['auth']['client_id'];
+        $newData  = [
+            'trx_id' => $trxId,
+            'type'   => 'updateBilling',
+            'client_id' => $clientId,
+        ];
+
+        if (! isset($data['trx_amount'])) {
+            throw new \RuntimeException('trx_amount required');
+        }
+
+        if (! isset($data['customer_name'])) {
+            throw new \RuntimeException('customer_name required');
+        }
+
+        $newData['customer_name'] = $data['customer_name'];
+        $newData['trx_amount']    = $data['trx_amount'];
+        $newData['datetime_expired'] = is_null($data['datetime_expired']) ? null : $data['datetime_expired']->format('c');
+        $newData['customer_email'] = $data['customer_email'] ?? '';
+        $newData['customer_phone'] = $data['customer_phone'] ?? '';
+        $newData['description'] = $data['description'] ?? '';
+        print_r($newData);
+        try {
+            $response = $this->sendRequest($newData);
+            return $response;
+        } catch (\Exception $e) {
+            throw new \RuntimeException($e->getMessage());
+        }
     }
 
     /**
