@@ -226,12 +226,12 @@ class Bri implements AdapterInterface
 
         try {
             $response = $this->getClient()->send($request);
-            if ($response->getStatusCode() == '200') {
+            if ($response->getStatusCode() == '201') {
                 $jsonResponse = json_decode($response->getBody()->getContents(), true);
                 return $jsonResponse;
             }
 
-            $message = $response->getStatusCode() . ':' . $jsonResponse['responseCode'] . ':' . $jsonResponse['responseCode'];
+            $message = $response->getStatusCode() . ':' . $jsonResponse['responseCode'] . ':' . $jsonResponse['responseDescription'];
             throw new \RuntimeException($message);
         } catch (\Exception $e) {
             throw new \RuntimeException($e->getMessage());
